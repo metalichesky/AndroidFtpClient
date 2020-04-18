@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">FtpClient</string>
+
+    <string name="title_connection">Connection</string>
+    <string name="title_filebrowsing">File browser</string>
+    <string name="title_file_info">File info</string>
+    <string name="title_file_options">Options</string>
+
+    <string name="title_file_download_dir">Choose Download Directory</string>
+
+    <string name="connection_hostname">Hostname</string>
+    <string name="connection_port">Port</string>
+    <string name="connection_username">Username</string>
+    <string name="connection_password">Password</string>
+    <string name="connection_authorize">Authorize</string>
+
+    <string name="options_file_info">Info</string>
+    <string name="options_file_delete">Delete</string>
+    <string name="options_file_download">Download</string>
+</resources>

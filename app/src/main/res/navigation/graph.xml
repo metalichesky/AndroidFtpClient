@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/fragmentFtpConnection"
+    android:id="@+id/graph">
+
+    <fragment
+        android:id="@+id/fragmentFtpConnection"
+        android:name="com.example.ftpclient.ui.fragment.FragmentFtpConnection"
+        android:label="GrammarFragment"
+        tools:layout="@layout/fragment_ftp_connection">
+        <action
+            android:id="@+id/action_fragmentFtpConnection_to_fragmentFtpFilebrowsing"
+            app:destination="@id/fragmentFtpFilebrowsing" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentFtpFilebrowsing"
+        android:name="com.example.ftpclient.ui.fragment.FragmentFtpFilebrowsing"
+        android:label="ChainsFragment"
+        tools:layout="@layout/fragment_ftp_filebrowsing">
+        <action
+            android:id="@+id/action_fragmentFtpFilebrowsing_to_fragmentFtpConnection"
+            app:destination="@id/fragmentFtpConnection" />
+    </fragment>
+</navigation>

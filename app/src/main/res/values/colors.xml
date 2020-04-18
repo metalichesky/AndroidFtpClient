@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1C4668</color>
+    <color name="colorAccent">#F44336</color>
+    <color name="colorDivider">#383838</color>
+    <color name="colorSelection">#8B8B8B</color>
+    <color name="colorBackground">#FFFFFF</color>
+
+    <color name="colorTextDark">#000000</color>
+
+    <color name="colorTextInput">#000000</color>
+    <color name="colorTextInputHint">#1C4668</color>
+    <color name="colorTextInputBorder">#1C4668</color>
+    <color name="backgroundShadowed">#80000000</color>
+</resources>

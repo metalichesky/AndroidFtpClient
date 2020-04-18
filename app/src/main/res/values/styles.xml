@@ -1,0 +1,46 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+
+        <item name="kfc_theme_background">@color/colorBackground</item>
+        <item name="kfc_theme_foreground">@color/colorPrimary</item>
+        <item name="kfc_theme_title">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_breadcrumb">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_toolbox">@color/colorPrimary</item>
+        <item name="kfc_theme_search_text">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_search_hint">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_status">@color/colorPrimary</item>
+        <item name="kfc_theme_file_icon">@color/colorPrimary</item>
+        <item name="kfc_theme_file_name">@color/colorPrimary</item>
+        <item name="kfc_theme_file_information">@color/colorAccent</item>
+        <item name="kfc_theme_file_flag">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_file_asterisk">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_checkbox">@color/colorAccent</item>
+        <item name="kfc_theme_cancel_button">@color/colorAccent</item>
+        <item name="kfc_theme_ok_button">@color/colorAccent</item>
+        <item name="kfc_theme_create_folder_button">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="textInputFilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="hintTextColor">@color/colorTextInputHint</item>
+        <item name="boxStrokeColor">@color/colorTextInputBorder</item>
+        <item name="boxBackgroundColor">@color/colorBackground</item>
+    </style>
+
+    <style name="textEdit" parent="Widget.AppCompat.EditText">
+        <item name="android:textColorHint">@color/colorTextInputHint</item>
+        <item name="android:textColor">@color/colorTextInput</item>
+    </style>
+
+    <style name="chipChoice" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="checkedIcon">@drawable/ic_chip_choice</item>
+        <item name="checkedIconVisible">true</item>
+        <item name="rippleColor">@color/colorPrimary</item>
+    </style>
+</resources>
