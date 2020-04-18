@@ -16,21 +16,21 @@ class CustomFilePicker {
             context,
             allowBrowsing = true, // Allow User Browsing
             allowCreateFolder = true, // Allow User to create Folder
-            allowMultipleFiles = false, // Allow User to Select Multiple Files
+            allowMultipleFiles = params.minimumFiles > 1, // Allow User to Select Multiple Files
             allowSelectFolder = false, // Allow User to Select Folder
-            minSelectedFiles = 0, // Allow User to Selec Minimum Files Selected
-            maxSelectedFiles = 0, // Allow User to Selec Minimum Files Selected
+            minSelectedFiles = params.minimumFiles, // Allow User to Selec Minimum Files Selected
+            maxSelectedFiles = params.maximumFiles, // Allow User to Selec Minimum Files Selected
             showFiles = true, // Show Files or Show Folder Only
             showFoldersFirst = true, // Show Folders First or Only Files
             showFolders = true, //Show Folders
             showHiddenFiles = true, // Show System Hidden Files
             initialFolder = params.initialFolder, //Initial Folder
             restoreFolder = false, //Restore Folder After Adding
-            cancelable = true
-        ) //Dismiss Dialog On Cancel (Optional)
+            cancelable = true //Dismiss Dialog On Cancel (Optional)
+        )
 
         fileChooser?.apply {
-//            title(params.title)
+            title(params.title)
 //            sorter(Sorter.ByLatestModification) // Sort Data (Optional)
             onSelectedFilesListener {
                 // Callback Returns Selected File Object  (Optional)
@@ -66,6 +66,16 @@ class CustomFilePicker {
             return this
         }
 
+        fun setMinimumFiles(min: Int) : Builder {
+            params.minimumFiles = min
+            return this
+        }
+
+        fun setMaximumFiles(max: Int) : Builder {
+            params.maximumFiles = max
+            return this
+        }
+
         fun setTitle(title: String): Builder {
             params.title = title
             return this
@@ -82,6 +92,8 @@ class CustomFilePicker {
         var initialFolder: File = Environment.getRootDirectory()
         var onFileSelected: OnFileSelected = null
         var onUriSelected: OnUriSelected = null
+        var minimumFiles: Int = 0
+        var maximumFiles: Int = 0
     }
 
 }

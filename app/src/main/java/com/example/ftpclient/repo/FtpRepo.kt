@@ -7,6 +7,7 @@ import org.apache.commons.net.ftp.FTPReply
 import timber.log.Timber
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
 import java.net.SocketException
@@ -143,6 +144,17 @@ class FtpRepo {
         try {
             val downloaded = ftpClient.retrieveFile(file.name, outputStream)
             println("File downloaded $downloaded")
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+        } catch (ex: SocketException) {
+            ex.printStackTrace()
+        }
+    }
+
+    fun uploadFile(fileName: String, inputStream: InputStream) {
+        try {
+            val uploaded = ftpClient.appendFile(fileName, inputStream)
+            println("File uploaded $uploaded")
         } catch (ex: IOException) {
             ex.printStackTrace()
         } catch (ex: SocketException) {

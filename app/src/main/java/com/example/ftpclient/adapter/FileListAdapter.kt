@@ -87,15 +87,11 @@ class FileListAdapter() : RecyclerView.Adapter<FileListAdapter.ViewHolder>(){
         val optionsButton = view.btnOptions
         val container = view.container
         fun bind(item: FTPFile){
-//            if (adapterPosition == selectedItem) {
-//                container.setBackgroundColor(ContextCompat.getColor(App.getContext(), R.color.colorSelection))
-//            } else {
-//                container.setBackgroundColor(ContextCompat.getColor(App.getContext(), R.color.colorBackground))
-//            }
             container.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     onItemClick(adapterPosition)
                 }
+                fileName.isSelected = true
             }
             type.setImageResource(if (item.isDirectory) {
                 R.drawable.ic_folder
@@ -103,15 +99,6 @@ class FileListAdapter() : RecyclerView.Adapter<FileListAdapter.ViewHolder>(){
                 R.drawable.ic_file
             })
             fileName.setText(item.name)
-//            fileName.setOnClickListener {
-//
-//            }
-
-            container.setOnGenericMotionListener(object: View.OnGenericMotionListener{
-                override fun onGenericMotion(v: View?, event: MotionEvent?): Boolean {
-                    return true
-                }
-            })
 
             optionsButton.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {

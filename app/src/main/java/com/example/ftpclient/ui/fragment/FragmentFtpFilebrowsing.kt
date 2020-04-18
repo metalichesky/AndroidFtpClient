@@ -28,6 +28,7 @@ import com.example.ftpclient.vm.FtpFilesViewModel
 import kotlinx.android.synthetic.main.fragment_ftp_filebrowsing.*
 import org.apache.commons.net.ftp.FTPFile
 import timber.log.Timber
+import java.io.File
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -73,6 +74,9 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
         }
         btnRefresh.setOnClickListener {
             ftpFilesViewModel.initDirectory()
+        }
+        btnUpload.setOnClickListener {
+            upload()
         }
         adapter?.onItemClick = {
             adapter?.getItem(it)?.let { file ->
@@ -180,21 +184,88 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
         val ctx = context ?: return
         file ?: return
         CustomFilePicker.Builder()
-            .setTitle(ctx.getString(R.string.title_file_download_dir))
+            .setTitle(ctx.getString(R.string.title_choose_download_dir))
             .setOnFileSelected {
                 it?.firstOrNull()?.let { path ->
                     Timber.d("Selected download dir: ${path?.absolutePath}")
-                    ftpFilesViewModel.download(path, file) {
+                    inputDownloadFileName(file, path)
+                }
+            }
+            .setInitialFolder(
+                ctx.externalMediaDirs?.getOrNull(0)
+                    ?: ctx.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                    ?: Environment.getRootDirectory()
+            )
+            .build(ctx).show()
+    }
+
+    private fun inputDownloadFileName(fileToDownload: FTPFile, selectedDir: File, errorMessage: String = "") {
+        val ctx = context ?: return
+        val dialogBuilder = CustomDialog.Builder()
+            .setTitle(ctx.getString(R.string.title_input_file_name))
+            .setInputEnabled(true)
+            .setInputHint(ctx.getString(R.string.title_input_file_name))
+            .setInputText(fileToDownload.name)
+            .setCancelButtonEnabled(true)
+            .setOnOkClickListener {
+                val newFile = File(selectedDir, it)
+                if (it.isEmpty() || newFile.exists()) {
+                    inputDownloadFileName(fileToDownload, selectedDir, "File already exists")
+                } else {
+                    ftpFilesViewModel.download(fileToDownload, newFile) {
                         Timber.d("Download finished")
                     }
                 }
             }
-            .setInitialFolder(ctx.externalMediaDirs?.getOrNull(0) ?:
-            ctx.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?:
-            Environment.getRootDirectory()
+        if (errorMessage.isNotEmpty()) {
+            dialogBuilder.setMessage(errorMessage)
+        }
+        dialogBuilder.build(ctx).show()
+    }
+
+    private fun upload() {
+        val ctx = context ?: return
+        CustomFilePicker.Builder()
+            .setTitle(ctx.getString(R.string.title_choose_upload_file))
+            .setMinimumFiles(1)
+            .setMaximumFiles(Int.MAX_VALUE)
+            .setOnFileSelected {
+                it?.firstOrNull()?.let { file ->
+                    Timber.d("Selected upload file: ${file.absolutePath}")
+                    inputUploadFileName(file)
+                }
+            }
+            .setInitialFolder(
+                ctx.externalMediaDirs?.getOrNull(0)
+                    ?: ctx.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                    ?: Environment.getRootDirectory()
             )
             .build(ctx).show()
     }
+
+    private fun inputUploadFileName(file: File, errorMessage: String = "") {
+        val ctx = context ?: return
+        val dialogBuilder = CustomDialog.Builder()
+            .setTitle(ctx.getString(R.string.title_input_file_name))
+            .setInputEnabled(true)
+            .setInputHint(ctx.getString(R.string.title_input_file_name))
+            .setInputText(file.name)
+            .setCancelButtonEnabled(true)
+            .setOnOkClickListener {
+                if (it.isEmpty() || ftpFilesViewModel.isFileNameExists(it)) {
+                    inputUploadFileName(file, "File already exists")
+                } else {
+                    ftpFilesViewModel.upload(file, it) {
+                        Timber.d("Upload finished")
+                    }
+                }
+            }
+        if (errorMessage.isNotEmpty()) {
+            dialogBuilder.setMessage(errorMessage)
+        }
+        dialogBuilder.build(ctx).show()
+    }
+
 }
 
 fun FTPFile.getInfo(): String {

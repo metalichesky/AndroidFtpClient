@@ -67,7 +67,17 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
         currentPath.postValue(path.toString())
     }
 
-    fun connect(onFinished: (()->Unit)? = null) {
+    fun isFileNameExists(fileName: String): Boolean {
+        val index = currentDirFiles.value?.indexOfFirst { it.isFile && it.name == fileName }
+        return index != null && index >= 0
+    }
+
+    fun isDirNameExists(dirName: String): Boolean {
+        val index = currentDirFiles.value?.indexOfFirst { it.isDirectory && it.name == dirName }
+        return index != null && index >= 0
+    }
+
+    fun connect(onFinished: OnFinished = null) {
         launch {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
@@ -93,7 +103,7 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
         }
     }
 
-    fun disconnect(onFinished: (()->Unit)? = null) {
+    fun disconnect(onFinished: OnFinished = null) {
         launch {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
@@ -110,7 +120,7 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
         }
     }
 
-    fun initDirectory(onFinished: (()->Unit)? = null) {
+    fun initDirectory(onFinished: OnFinished = null) {
         launch {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
@@ -122,14 +132,14 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
             filesList.addAll(files)
 
             withContext(Dispatchers.Main) {
-                onFinished?.invoke()
                 currentDirFiles.postValue(filesList)
+                onFinished?.invoke()
                 needShowProgress.postValue(false)
             }
         }
     }
 
-    fun goToDirectory(path: String, onFinished: (()->Unit)? = null) {
+    fun goToDirectory(path: String, onFinished: OnFinished = null) {
         launch {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
@@ -139,8 +149,9 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
             dirPath.offer(path)
             currentDir.postValue(path)
             repo.changeDir(path)
-            initDirectory()
-            updatePath()
+            initDirectory{
+                updatePath()
+            }
 
             withContext(Dispatchers.Main) {
                 onFinished?.invoke()
@@ -149,7 +160,7 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
         }
     }
 
-    fun goToParentDirectory(onFinished: (()->Unit)? = null) {
+    fun goToParentDirectory(onFinished: OnFinished = null) {
         launch {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
@@ -157,8 +168,9 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
 
             currentDir.postValue(dirPath.poll())
             repo.changeDir("", true)
-            initDirectory()
-            updatePath()
+            initDirectory{
+                updatePath()
+            }
 
             withContext(Dispatchers.Main) {
                 onFinished?.invoke()
@@ -167,7 +179,7 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
         }
     }
 
-    fun deleteFile(path: String, onFinished: (()->Unit)? = null) {
+    fun deleteFile(path: String, onFinished: OnFinished = null) {
         launch {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
@@ -175,7 +187,6 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
 
             repo.deleteFile(path)
             initDirectory()
-            updatePath()
 
             withContext(Dispatchers.Main) {
                 onFinished?.invoke()
@@ -184,19 +195,37 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
         }
     }
 
-    fun download(destinationPath: File, file: FTPFile, onFinished: (()->Unit)? = null) {
+    fun download(file: FTPFile, destinationFile: File, onFinished: OnFinished = null) {
         launch {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
             }
 
-            val newFile = File(destinationPath, file.name)
-            repo.downloadFile(file, newFile.outputStream())
+            repo.downloadFile(file, destinationFile.outputStream())
 
 
             withContext(Dispatchers.Main) {
+                onFinished?.invoke()
+                needShowProgress.postValue(false)
+            }
+        }
+    }
+
+    fun upload(file: File, destinationFileName: String, onFinished: OnFinished = null) {
+        launch {
+            withContext(Dispatchers.Main) {
+                needShowProgress.postValue(true)
+            }
+
+            repo.uploadFile(destinationFileName, file.inputStream())
+            initDirectory()
+
+            withContext(Dispatchers.Main) {
+                onFinished?.invoke()
                 needShowProgress.postValue(false)
             }
         }
     }
 }
+
+typealias OnFinished = (() -> Unit)?
