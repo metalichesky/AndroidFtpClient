@@ -57,13 +57,14 @@
                     android:src="@drawable/ic_file_upload" />
 
                 <ImageButton
-                    android:id="@+id/btnRefresh"
+                    android:id="@+id/btnCreateDir"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/shape_button"
                     android:padding="5dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/ic_refresh" />
+                    android:src="@drawable/ic_create_new_folder" />
+
             </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -72,47 +73,53 @@
         android:id="@+id/containerPath"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/tvPath"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:textSize="14sp"
             android:ellipsize="start"
             android:textColor="@color/colorTextDark"
-            />
+            android:textSize="14sp" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/colorDivider"/>
+            android:background="@color/colorDivider" />
     </LinearLayout>
 
-    <FrameLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/containerSwipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvFiles"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/item_file_list" />
-
         <FrameLayout
-            android:id="@+id/containerProgress"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/backgroundShadowed"
-            android:visibility="gone"
-            >
-            <ProgressBar
-                android:layout_height="48dp"
-                android:layout_width="48dp"
-                android:layout_gravity="center"
-                android:progressTint="@color/colorPrimary"/>
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvFiles"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/item_file_list" />
+
+            <FrameLayout
+                android:id="@+id/containerProgress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/backgroundShadowed"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:progressTint="@color/colorPrimary" />
+            </FrameLayout>
         </FrameLayout>
-    </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>

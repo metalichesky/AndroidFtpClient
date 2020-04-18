@@ -149,9 +149,8 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
             dirPath.offer(path)
             currentDir.postValue(path)
             repo.changeDir(path)
-            initDirectory{
-                updatePath()
-            }
+            initDirectory()
+            updatePath()
 
             withContext(Dispatchers.Main) {
                 onFinished?.invoke()
@@ -168,9 +167,40 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
 
             currentDir.postValue(dirPath.poll())
             repo.changeDir("", true)
-            initDirectory{
-                updatePath()
+            initDirectory()
+            updatePath()
+
+            withContext(Dispatchers.Main) {
+                onFinished?.invoke()
+                needShowProgress.postValue(false)
             }
+        }
+    }
+
+    fun createDirectory(dirName: String, onFinished: OnFinished = null) {
+        launch {
+            withContext(Dispatchers.Main) {
+                needShowProgress.postValue(true)
+            }
+
+            repo.createDir(dirName)
+            initDirectory()
+
+            withContext(Dispatchers.Main) {
+                onFinished?.invoke()
+                needShowProgress.postValue(false)
+            }
+        }
+    }
+
+    fun deleteDirectory(dirName: String, onFinished: OnFinished = null) {
+        launch {
+            withContext(Dispatchers.Main) {
+                needShowProgress.postValue(true)
+            }
+
+            repo.removeDir(dirName)
+            initDirectory()
 
             withContext(Dispatchers.Main) {
                 onFinished?.invoke()

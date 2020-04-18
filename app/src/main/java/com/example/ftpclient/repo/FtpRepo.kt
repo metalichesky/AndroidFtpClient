@@ -140,6 +140,28 @@ class FtpRepo {
         }
     }
 
+    fun createDir(dirName: String) {
+        try {
+            val created = ftpClient.makeDirectory(dirName)
+            println("Dir created ${created}")
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+        } catch (ex: SocketException) {
+            ex.printStackTrace()
+        }
+    }
+
+    fun removeDir(dirName: String) {
+        try {
+            val removed = ftpClient.removeDirectory(dirName)
+            println("Dir removed ${removed}")
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+        } catch (ex: SocketException) {
+            ex.printStackTrace()
+        }
+    }
+
     fun downloadFile(file: FTPFile, outputStream: OutputStream) {
         try {
             val downloaded = ftpClient.retrieveFile(file.name, outputStream)

@@ -9,6 +9,10 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.AlphaAnimation
+import android.view.animation.AnimationSet
+import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -26,6 +30,7 @@ import com.example.ftpclient.ui.activity.MainActivity
 import com.example.ftpclient.util.OnBackPressedListener
 import com.example.ftpclient.vm.FtpFilesViewModel
 import kotlinx.android.synthetic.main.fragment_ftp_filebrowsing.*
+import kotlinx.coroutines.delay
 import org.apache.commons.net.ftp.FTPFile
 import timber.log.Timber
 import java.io.File
@@ -62,7 +67,7 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
         })
 
         ftpFilesViewModel.needShowProgress.observe(viewLifecycleOwner, Observer {
-            containerProgress.visibility = if (it) View.VISIBLE else View.GONE
+            showProgress(it)
         })
 
         ftpFilesViewModel.currentPath.observe(viewLifecycleOwner, Observer {
@@ -72,12 +77,22 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
         btnBack.setOnClickListener {
             back()
         }
-        btnRefresh.setOnClickListener {
-            ftpFilesViewModel.initDirectory()
-        }
         btnUpload.setOnClickListener {
             upload()
         }
+        btnCreateDir.setOnClickListener {
+            createDirectory()
+        }
+        containerSwipeRefresh.setOnRefreshListener {
+            Timber.d("Refresh swipe")
+            ftpFilesViewModel.initDirectory{
+                containerSwipeRefresh.isRefreshing = false
+            }
+        }
+//        containerSwipeRefresh.setOnChildScrollUpCallback { parent, child ->
+//            Timber.d("Child scroll up")
+//            true
+//        }
         adapter?.onItemClick = {
             adapter?.getItem(it)?.let { file ->
                 if (file.isDirectory) {
@@ -102,7 +117,11 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
             },
             FileOption(ctx.getString(R.string.options_file_delete)) {
                 adapter?.getItem(it)?.let { file ->
-                    ftpFilesViewModel.deleteFile(file.name)
+                    if (file.isDirectory) {
+                        ftpFilesViewModel.deleteDirectory(file.name)
+                    } else {
+                        ftpFilesViewModel.deleteFile(file.name)
+                    }
                 }
             },
             FileOption(ctx.getString(R.string.options_file_download)) {
@@ -154,6 +173,24 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
             (context as? MainActivity)?.navigateTo(MainActivity.Pages.FTP_CONNECTION)
         } else {
             ftpFilesViewModel.goToParentDirectory()
+        }
+    }
+
+    private fun showProgress(needShow: Boolean) {
+        if (needShow){
+            val animation = AlphaAnimation(0.0f, 1.0f).apply {
+                setInterpolator(AccelerateInterpolator())
+                duration = 300
+            }
+            containerProgress.animation = animation
+            containerProgress.visibility = View.VISIBLE
+        } else {
+            val animation = AlphaAnimation(1.0f, 0.0f).apply {
+                setInterpolator(DecelerateInterpolator())
+                duration = 300
+            }
+            containerProgress.animation = animation
+            containerProgress.visibility = View.GONE
         }
     }
 
@@ -257,6 +294,28 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
                 } else {
                     ftpFilesViewModel.upload(file, it) {
                         Timber.d("Upload finished")
+                    }
+                }
+            }
+        if (errorMessage.isNotEmpty()) {
+            dialogBuilder.setMessage(errorMessage)
+        }
+        dialogBuilder.build(ctx).show()
+    }
+
+    private fun createDirectory(errorMessage: String = "") {
+        val ctx = context ?: return
+        val dialogBuilder = CustomDialog.Builder()
+            .setTitle(ctx.getString(R.string.title_input_file_name))
+            .setInputEnabled(true)
+            .setInputHint(ctx.getString(R.string.title_input_file_name))
+            .setCancelButtonEnabled(true)
+            .setOnOkClickListener {
+                if (it.isEmpty() || ftpFilesViewModel.isDirNameExists(it)) {
+                    createDirectory("Directory already exists")
+                } else {
+                    ftpFilesViewModel.createDirectory(it) {
+                        Timber.d("Create dir finished")
                     }
                 }
             }
