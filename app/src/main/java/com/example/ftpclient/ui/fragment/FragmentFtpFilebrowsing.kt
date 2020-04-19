@@ -1,5 +1,7 @@
 package com.example.ftpclient.ui.fragment
 
+import android.app.DownloadManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Paint
@@ -13,8 +15,11 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.AlphaAnimation
 import android.view.animation.AnimationSet
 import android.view.animation.DecelerateInterpolator
+import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +32,8 @@ import com.example.ftpclient.model.FileOption
 import com.example.ftpclient.ui.CustomDialog
 import com.example.ftpclient.ui.CustomFilePicker
 import com.example.ftpclient.ui.activity.MainActivity
+import com.example.ftpclient.util.CustomFileProvider
+import com.example.ftpclient.util.FTPUtil
 import com.example.ftpclient.util.OnBackPressedListener
 import com.example.ftpclient.vm.FtpFilesViewModel
 import kotlinx.android.synthetic.main.fragment_ftp_filebrowsing.*
@@ -222,6 +229,8 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
         file ?: return
         CustomFilePicker.Builder()
             .setTitle(ctx.getString(R.string.title_choose_download_dir))
+            .setAllowSelectFolder(true)
+            .setFilesLimit(0,0)
             .setOnFileSelected {
                 it?.firstOrNull()?.let { path ->
                     Timber.d("Selected download dir: ${path?.absolutePath}")
@@ -229,8 +238,9 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
                 }
             }
             .setInitialFolder(
-                ctx.externalMediaDirs?.getOrNull(0)
-                    ?: ctx.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) ?:
+
+                ctx.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
                     ?: Environment.getRootDirectory()
             )
             .build(ctx).show()
@@ -247,9 +257,10 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
             .setOnOkClickListener {
                 val newFile = File(selectedDir, it)
                 if (it.isEmpty() || newFile.exists()) {
-                    inputDownloadFileName(fileToDownload, selectedDir, "File already exists")
+                    inputDownloadFileName(fileToDownload, selectedDir, ctx.getString(R.string.error_file_already_exists))
                 } else {
                     ftpFilesViewModel.download(fileToDownload, newFile) {
+                        openFile(newFile)
                         Timber.d("Download finished")
                     }
                 }
@@ -264,8 +275,7 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
         val ctx = context ?: return
         CustomFilePicker.Builder()
             .setTitle(ctx.getString(R.string.title_choose_upload_file))
-            .setMinimumFiles(1)
-            .setMaximumFiles(Int.MAX_VALUE)
+            .setFilesLimit(1,1)
             .setOnFileSelected {
                 it?.firstOrNull()?.let { file ->
                     Timber.d("Selected upload file: ${file.absolutePath}")
@@ -290,7 +300,7 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
             .setCancelButtonEnabled(true)
             .setOnOkClickListener {
                 if (it.isEmpty() || ftpFilesViewModel.isFileNameExists(it)) {
-                    inputUploadFileName(file, "File already exists")
+                    inputUploadFileName(file, ctx.getString(R.string.error_file_already_exists))
                 } else {
                     ftpFilesViewModel.upload(file, it) {
                         Timber.d("Upload finished")
@@ -312,7 +322,7 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
             .setCancelButtonEnabled(true)
             .setOnOkClickListener {
                 if (it.isEmpty() || ftpFilesViewModel.isDirNameExists(it)) {
-                    createDirectory("Directory already exists")
+                    createDirectory(ctx.getString(R.string.error_file_already_exists))
                 } else {
                     ftpFilesViewModel.createDirectory(it) {
                         Timber.d("Create dir finished")
@@ -325,6 +335,21 @@ class FragmentFtpFilebrowsing : Fragment(), OnBackPressedListener {
         dialogBuilder.build(ctx).show()
     }
 
+    private fun openFile(file: File) {
+        val ctx = context ?: return
+
+        val uri = FileProvider.getUriForFile(ctx, CustomFileProvider.getAuthorities(), file)
+        val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString()) ?: ""
+        val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: ""
+        Timber.d("Open file URI = ${uri}, extension = ${extension}, mime = ${mimeType}")
+
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, mimeType)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        context?.startActivity(intent)
+    }
+
 }
 
 fun FTPFile.getInfo(): String {
@@ -335,10 +360,10 @@ fun FTPFile.getInfo(): String {
     else "unknown"
     val owner = this.user
 
-    val dotIdx = this.name.lastIndexOf(".")
     var extension = ""
+    val dotIdx = this.name.lastIndexOf(".")
     if (dotIdx >= 0) {
-        extension = name.substring(dotIdx)
+        extension = extension.substring(dotIdx)
     }
 
     var sizeType = "Byte"

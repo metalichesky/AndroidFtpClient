@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.ftpclient.model.FtpConfig
 import com.example.ftpclient.repo.FtpRepo
+import com.example.ftpclient.util.FTPUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -230,6 +231,15 @@ class FtpFilesViewModel : ViewModel(), CoroutineScope {
             withContext(Dispatchers.Main) {
                 needShowProgress.postValue(true)
             }
+            val path = (currentPath.value ?: "" ) + file.name
+            val uri = FTPUtil.UrlBuilder()
+                .setHostname(getHostname())
+                .setPort(getPort())
+                .setUsername(getUsername())
+                .setPassword(getPassword())
+                .setPath(path)
+                .build()
+            Timber.d("Download by Uri: $uri")
 
             repo.downloadFile(file, destinationFile.outputStream())
 

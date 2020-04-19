@@ -9,6 +9,7 @@
     <string name="title_choose_download_dir">Choose Download Directory</string>
     <string name="title_choose_upload_file">Choose Upload File</string>
     <string name="title_input_file_name">Input File Name</string>
+    <string name="title_input_folder_name">Input Folder Name</string>
 
     <string name="error_file_already_exists">File already exists</string>
 

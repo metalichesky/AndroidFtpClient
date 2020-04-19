@@ -12,19 +12,19 @@
         <item name="kfc_theme_foreground">@color/colorPrimary</item>
         <item name="kfc_theme_title">@color/colorPrimaryDark</item>
         <item name="kfc_theme_breadcrumb">@color/colorPrimaryDark</item>
-        <item name="kfc_theme_toolbox">@color/colorPrimary</item>
+        <item name="kfc_theme_toolbox">@color/colorPrimaryDark</item>
         <item name="kfc_theme_search_text">@color/colorPrimaryDark</item>
         <item name="kfc_theme_search_hint">@color/colorPrimaryDark</item>
         <item name="kfc_theme_status">@color/colorPrimary</item>
-        <item name="kfc_theme_file_icon">@color/colorPrimary</item>
+        <item name="kfc_theme_file_icon">@color/colorAccent</item>
         <item name="kfc_theme_file_name">@color/colorPrimary</item>
         <item name="kfc_theme_file_information">@color/colorAccent</item>
-        <item name="kfc_theme_file_flag">@color/colorPrimaryDark</item>
-        <item name="kfc_theme_file_asterisk">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_file_flag">@color/colorPrimary</item>
+        <item name="kfc_theme_file_asterisk">@color/colorPrimary</item>
         <item name="kfc_theme_checkbox">@color/colorAccent</item>
-        <item name="kfc_theme_cancel_button">@color/colorAccent</item>
-        <item name="kfc_theme_ok_button">@color/colorAccent</item>
-        <item name="kfc_theme_create_folder_button">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_cancel_button">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_ok_button">@color/colorPrimaryDark</item>
+        <item name="kfc_theme_create_folder_button">@color/colorPrimary</item>
     </style>
 
     <style name="textInputFilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">

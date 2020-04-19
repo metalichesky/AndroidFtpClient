@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import com.zaphlabs.filechooser.KnotFileChooser
-import com.zaphlabs.filechooser.Sorter
 import com.zaphlabs.filechooser.utils.FileType
 import java.io.File
 
@@ -14,16 +13,16 @@ class CustomFilePicker {
     constructor(context: Context, params: Params) {
         fileChooser = KnotFileChooser(
             context,
-            allowBrowsing = true, // Allow User Browsing
-            allowCreateFolder = true, // Allow User to create Folder
+            allowBrowsing = params.allowBrowsing, // Allow User Browsing
+            allowCreateFolder = params.allowCreateFolder, // Allow User to create Folder
             allowMultipleFiles = params.minimumFiles > 1, // Allow User to Select Multiple Files
-            allowSelectFolder = false, // Allow User to Select Folder
+            allowSelectFolder = params.allowSelectFolder, // Allow User to Select Folder
             minSelectedFiles = params.minimumFiles, // Allow User to Selec Minimum Files Selected
             maxSelectedFiles = params.maximumFiles, // Allow User to Selec Minimum Files Selected
-            showFiles = true, // Show Files or Show Folder Only
-            showFoldersFirst = true, // Show Folders First or Only Files
-            showFolders = true, //Show Folders
-            showHiddenFiles = true, // Show System Hidden Files
+            showFiles = params.showFiles, // Show Files or Show Folder Only
+            showFoldersFirst = params.foldersFirst, // Show Folders First or Only Files
+            showFolders = params.showFolders, //Show Folders
+            showHiddenFiles = params.showHiddenFiles, // Show System Hidden Files
             initialFolder = params.initialFolder, //Initial Folder
             restoreFolder = false, //Restore Folder After Adding
             cancelable = true //Dismiss Dialog On Cancel (Optional)
@@ -48,7 +47,7 @@ class CustomFilePicker {
         fileChooser?.show()
     }
 
-    class Builder() {
+    class Builder {
         private var params = Params()
 
         fun setOnFileSelected(onFileSelected: OnFileSelected = null): Builder {
@@ -66,12 +65,8 @@ class CustomFilePicker {
             return this
         }
 
-        fun setMinimumFiles(min: Int) : Builder {
+        fun setFilesLimit(min: Int, max: Int) : Builder {
             params.minimumFiles = min
-            return this
-        }
-
-        fun setMaximumFiles(max: Int) : Builder {
             params.maximumFiles = max
             return this
         }
@@ -81,19 +76,73 @@ class CustomFilePicker {
             return this
         }
 
+        fun setAllowSelectFolder(allow: Boolean): Builder {
+            params.allowSelectFolder = allow
+            return this
+        }
+
+        fun setAllowCreateFolder(allow: Boolean): Builder {
+            params.allowCreateFolder = allow
+            return this
+        }
+
+        fun setShowHiddenFiles(show: Boolean): Builder {
+            params.showHiddenFiles = show
+            return this
+        }
+
+        fun setShowFiles(show: Boolean): Builder {
+            params.showFiles = show
+            return this
+        }
+
+        fun setShowFolders(show: Boolean): Builder {
+            params.showFolders = show
+            return this
+        }
+
+        fun setFoldersFirst(foldersFirst: Boolean) : Builder {
+            params.foldersFirst = foldersFirst
+            return this
+        }
+
+        fun setAllowBrowsing(allowBrowsing: Boolean) : Builder {
+            params.allowBrowsing = allowBrowsing
+            return this
+        }
+
+        fun setCancelable(cancelable: Boolean) : Builder {
+            params.cancelable = cancelable
+            return this
+        }
+
+        fun setFileType(fileType: FileType) : Builder {
+            params.fileType = fileType
+            return this
+        }
+
         fun build(context: Context): CustomFilePicker {
             return CustomFilePicker(context, params)
         }
     }
 
 
-    class Params() {
+    class Params {
         var title = "Choose File"
         var initialFolder: File = Environment.getRootDirectory()
         var onFileSelected: OnFileSelected = null
         var onUriSelected: OnUriSelected = null
+        var showFiles: Boolean = true
+        var showFolders: Boolean = true
+        var allowBrowsing: Boolean = true
+        var allowSelectFolder: Boolean = true
+        var allowCreateFolder: Boolean = true
+        var foldersFirst: Boolean = true
+        var showHiddenFiles: Boolean = true
         var minimumFiles: Int = 0
-        var maximumFiles: Int = 0
+        var maximumFiles: Int = Int.MAX_VALUE
+        var fileType: FileType = FileType.ALL
+        var cancelable: Boolean = true
     }
 
 }
